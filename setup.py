@@ -6,7 +6,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-VERSION = '0.1.4'
+VERSION = '0.1.6'
 setuptools.setup(
     name='appengine_clean',
     version=VERSION,
@@ -25,6 +25,5 @@ setuptools.setup(
         'appengine-clean = appengine_clean.appengine_clean:main',                  
       ],              
     },
-    download_url='https://github.com/poweredbygrow/appengine_clean/tarball/' + VERSION,
     keywords=['utility', 'miscellaneous', 'library'],
 )

@@ -1,0 +1,11 @@
+strictness: high
+test-warnings: true
+doc-warnings: false
+
+pep8:
+  options:
+    max-line-length: 120
+
+pylint:
+  options:
+    max-line-length: 120

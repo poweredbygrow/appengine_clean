@@ -9,6 +9,11 @@ verify_ssl = true
 setuptools = "*"
 wheel = "*"
 twine = "*"
+black = "*"
+prospector = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

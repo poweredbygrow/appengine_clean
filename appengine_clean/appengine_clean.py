@@ -15,12 +15,12 @@ async def get_versions(project: str) -> Dict[str, List[Tuple[str, ...]]]:
 
     Key is the service name, value is a line containing information about the version.
     """
-    cmd = ['gcloud', '--project', project, 'app', 'versions', 'list']
-    print('Calling command:', ' '.join(cmd))
+    cmd = ["gcloud", "--project", project, "app", "versions", "list"]
+    print("Calling command:", " ".join(cmd))
     process = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.PIPE)
     stdout, _ = await process.communicate()
 
-    output = stdout.decode().strip().split('\n')
+    output = stdout.decode().strip().split("\n")
 
     versions = collections.defaultdict(list)
     # Remove header line
@@ -32,8 +32,15 @@ async def get_versions(project: str) -> Dict[str, List[Tuple[str, ...]]]:
     return versions
 
 
-async def delete_old_versions_multiple(projects: List[str], num_to_keep: int, fake=False):
-    await asyncio.wait([delete_old_versions(project, num_to_keep=num_to_keep, fake=fake) for project in projects])
+async def delete_old_versions_multiple(
+    projects: List[str], num_to_keep: int, fake=False
+):
+    await asyncio.wait(
+        [
+            delete_old_versions(project, num_to_keep=num_to_keep, fake=fake)
+            for project in projects
+        ]
+    )
 
 
 async def delete_old_versions(project: str, num_to_keep: int, fake=False):
@@ -81,44 +88,65 @@ async def delete_old_versions(project: str, num_to_keep: int, fake=False):
 
     # Go ahead and delete
     if total_to_delete:
-        cmd = ['gcloud', '--quiet', '--project', project, 'app', 'versions', 'delete'] \
-              + list(total_to_delete)
-        print('Running:', ' '.join(cmd))
+        cmd = [
+            "gcloud",
+            "--quiet",
+            "--project",
+            project,
+            "app",
+            "versions",
+            "delete",
+        ] + list(total_to_delete)
+        print("Running:", " ".join(cmd))
         if fake:
             return
-        process = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.PIPE)
+        process = await asyncio.create_subprocess_exec(
+            *cmd, stdout=asyncio.subprocess.PIPE
+        )
         await process.wait()
 
 
 async def async_main():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('project', nargs='+',
-                        help='The Google Cloud Platform project to delete versions from')
-    parser.add_argument('num_to_keep', type=int,
-                        help='The number of versions to keep for each service')
-    parser.add_argument('--force', action='store_true', default=False,
-                        help='Actually delete versions')
-    parser.add_argument('--dry-run', action='store_true', default=False,
-                        help='Perform a dry-run')
+    parser.add_argument(
+        "project",
+        nargs="+",
+        help="The Google Cloud Platform project to delete versions from",
+    )
+    parser.add_argument(
+        "num_to_keep", type=int, help="The number of versions to keep for each service"
+    )
+    parser.add_argument(
+        "--force", action="store_true", default=False, help="Actually delete versions"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", default=False, help="Perform a dry-run"
+    )
     args = parser.parse_args()
 
     if args.force and args.dry_run:
-        print('Can\'t specify --force and --dry-run')
+        print("Can't specify --force and --dry-run")
         sys.exit(1)
 
     if not args.force and not args.dry_run:
-        print('Must specify one of --force or --dry-run')
+        print("Must specify one of --force or --dry-run")
         sys.exit(1)
 
     if args.num_to_keep < 5:
-        print('You\'re keeping only', args.num_to_keep, 'versions. Are you sure you know what you '
-                                                        'are doing? (y/n) ', end='')
+        print(
+            "You're keeping only",
+            args.num_to_keep,
+            "versions. Are you sure you know what you " "are doing? (y/n) ",
+            end="",
+        )
         response = input()
-        if response != 'y':
+        if response != "y":
             sys.exit(1)
 
-    await delete_old_versions_multiple(args.project, args.num_to_keep, fake=args.dry_run)
+    await delete_old_versions_multiple(
+        args.project, args.num_to_keep, fake=args.dry_run
+    )
 
 
 def main():
@@ -127,5 +155,5 @@ def main():
     loop.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
